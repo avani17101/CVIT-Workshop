@@ -9,7 +9,7 @@ Work done during orientation workshop of Centre for Visual Information and Techn
   * [Pandas](https://github.com/avani17101/CVIT-Workshop/blob/master/day2/pandas.ipynb)
   * [Image Processing basics](https://github.com/avani17101/CVIT-Workshop/blob/master/day2/image_processing.ipynb)
 * Day3
-  * [Image Processing: Operations and Transfromations](https://github.com/avani17101/CVIT-Workshop/blob/master/day3/Image_processing2.ipynb)
+  * [Image Processing: Operations and Transformations](https://github.com/avani17101/CVIT-Workshop/blob/master/day3/Image_processing2.ipynb)
 * Day4
   * [Matching, Panorama, Depth estimation](https://github.com/avani17101/CVIT-Workshop/blob/master/day4/day4.ipynb)
 * Day5
@@ -26,7 +26,16 @@ Work done during orientation workshop of Centre for Visual Information and Techn
   * [Perceptron on MNIST dataset](https://github.com/avani17101/CVIT-Workshop/blob/master/day7/BoW_Word2Vec_C.ipynb)
   * [Perceptron on CIFAR10](https://github.com/avani17101/CVIT-Workshop/blob/master/day7/Perceptron_and_Tasks.ipynb)
  * Day8
-  * [KMeans from sratch](https://github.com/avani17101/CVIT-Workshop/tree/master/day8/afternoon)
+   * [KMeans from sratch](https://github.com/avani17101/CVIT-Workshop/tree/master/day8/afternoon)
 * Day9
-  * [KNN on CIFAR10](https://github.com/avani17101/CVIT-Workshop/blob/master/day9/knn.ipynb)
+   * [KNN on CIFAR10](https://github.com/avani17101/CVIT-Workshop/blob/master/day9/knn.ipynb)
+* Day10
+  * [Data Loader from scratch](https://github.com/avani17101/CVIT-Workshop/blob/master/day10/dataloader_scratch.ipynb)
+  * [CNN Introduction](https://github.com/avani17101/CVIT-Workshop/blob/master/day10/notebook/CNN_basics.ipynb)
+  * [CNN implementation on MNIST dataset](https://github.com/avani17101/CVIT-Workshop/blob/master/day10/my_cnn.ipynb) 
+* Day11
+  * [Ada guide](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/Ada%20guide)
+  * [Image annotator webapp](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/webapp)<br>  Instructions to run: cd into the directory app, install all dependencies and type "flask run"
+  * [Graphics](https://github.com/avani17101/CVIT-Workshop/tree/master/day12/graphics-boilerplate)
+ 
   
