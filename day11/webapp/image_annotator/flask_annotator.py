@@ -14,6 +14,7 @@ app.config.from_object(__name__)
 app.config.from_pyfile('config.cfg')
 
 
+
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -36,36 +37,36 @@ def teardown_request(exception):
     if db is not None:
         db.close()
 
-# def check_password(hashed_password, user_password):
-#     return hashed_password == hashlib.md5(user_password.encode()).hexdigest()
+def check_password(hashed_password, user_password):
+    return hashed_password == hashlib.md5(user_password.encode()).hexdigest()
 
-# def validate(username, password):
-#     con = sqlite3.connect('static/user.db')
-#     completion = False
-#     with con:
-#                 cur = con.cursor()
-#                 cur.execute("SELECT * FROM Users")
-#                 rows = cur.fetchall()
-#                 for row in rows:
-#                     dbUser = row[0]
-#                     dbPass = row[1]
-#                     if dbUser==username:
-#                         completion=check_password(dbPass, password)
-#     return completion
+def validate(username, password):
+    con = sqlite3.connect('static/user.db')
+    completion = False
+    with con:
+                cur = con.cursor()
+                cur.execute("SELECT * FROM Users")
+                rows = cur.fetchall()
+                for row in rows:
+                    dbUser = row[0]
+                    dbPass = row[1]
+                    if dbUser==username:
+                        completion=check_password(dbPass, password)
+    return completion
 
 
-# @app.route('/', methods=['GET', 'POST'])
-# def login():
-#     error = None
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         completion = validate(username, password)
-#         if completion ==False:
-#             error = 'Invalid Credentials. Please try again.'
-#         else:
-#             return redirect(url_for('img'))
-#     return render_template('login.html', error=error)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        completion = validate(username, password)
+        if completion ==False:
+            error = 'Invalid Credentials. Please try again.'
+        else:
+            return redirect(url_for('/'))
+    return render_template('login.html', error=error)
 
 @app.route('/')
 @app.route("/<int:id>")
