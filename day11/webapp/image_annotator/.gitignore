@@ -1,0 +1,6 @@
+tmp
+.idea
+*.pyc
+*.pkl
+static/img
+config.cfg

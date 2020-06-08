@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Annotation</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/imgareaselect-default.css') }}">
+    <style>
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        html {
+            height: auto !important;
+        }
+
+        img {
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+<input id="x1" type="number"/>
+<input id="y1" type="number"/>
+<input id="width" type="number"/>
+<input id="height" type="number"/>
+<img width=99% data-nr="{{ i }}" src="{{ url_for('static',filename='img/'~i~'.jpg') }}"/>
+
+
+<div class="messagepop pop">
+    <form method="post" id="new_message" action="/add">
+        <p>
+            <label for="annotation">Letter:</label><input id="annotation" type="text" size=2>
+            <label for="split_count">Split:</label><input id="split_count" type="text" size=2 value=2></p>
+
+        <p>
+            <input type="submit" value="Send" name="commit" id="message_submit"/>
+            <input type="button" value="Pass" name="pass" id="pass">
+            <input type="button" value="Next Image" name="next" id="next">
+            <input type="button" value="Split" name="split" id="split">
+        </p>
+    </form>
+</div>
+</body>
+<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.imgareaselect.min.js') }}"></script>
+<script>
+    var currentMousePos = { x: -1, y: -1 };
+    $(document).mousemove(function (event) {
+        currentMousePos.x = event.pageX;
+        currentMousePos.y = event.pageY;
+    });
+    $('html').css('height', 'auto');
+
+    var img = $('img');
+    var annot = $("#annotation");
+    var blobs = [];
+
+    var img_select = img.imgAreaSelect({
+        handles: true,
+        show: true,
+        onInit: load_blob_data,
+        onSelectEnd: function (img, obj) {
+            if (obj.width) {
+                $('#x1').val(obj.x1);
+                $('#y1').val(obj.y1);
+                $('#width').val(obj.width);
+                $('#height').val(obj.height);
+                annot.focus();
+                query_blob();
+
+            }
+        },
+        instance: true,
+        imageHeight: img[0].naturalHeight,
+        imageWidth: img[0].naturalWidth
+    });
+
+    function showNextBlob() {
+        var fblob = blobs.pop();
+
+        // if for some reason blobs are out of bounds, make
+        // them fit to edges
+        if (fblob.y + fblob.height > img[0].naturalHeight) {
+            fblob.height = img[0].naturalHeight - fblob.y;
+        }
+
+        img_select.setSelection(fblob.x, fblob.y,
+                                fblob.x + fblob.width,
+                                fblob.y + fblob.height);
+        img_select.update();
+        $('#x1').val(fblob.x);
+        $('#y1').val(fblob.y);
+        $('#width').val(fblob.width);
+        $('#height').val(fblob.height);
+
+        if (fblob.pred) {
+            annot.val(fblob.pred).select();
+        }
+        else {
+            query_blob();
+        }
+        annot.focus();
+    }
+
+    function query_blob() {
+        $.post('query_blob/' + $('img').data('nr'), {
+            x: Math.round($('#x1').val()),
+            y: Math.round($('#y1').val()),
+            width: Math.round($('#width').val()),
+            height: Math.round($('#height').val())
+        }, function (e) {
+            annot.val(e.prediction).select();
+        });
+    }
+
+    function load_blob_data() {
+        $.get('line_blobs/' + img.data('nr'), function (data) {
+            blobs = data['blobs'].sort(function (a, b) {
+                return b.x - a.x;
+            });
+            showNextBlob();
+        })
+    }
+
+    function load_image(i) {
+        img.attr('src', "/static/img/" + i + ".jpg").data('nr', i).on('load', function () {
+            load_blob_data();
+            img_select.setOptions({
+                show: true,
+                imageHeight: img[0].naturalHeight,
+                imageWidth: img[0].naturalWidth
+            });
+        });
+    }
+
+    $('#message_submit').on('click', function (e) {
+        e.preventDefault();
+        if (annot.val()) {
+            $.post('add', {
+                image: $('img').data('nr'),
+                x: Math.round($('#x1').val()),
+                y: Math.round($('#y1').val()),
+                width: Math.round($('#width').val()),
+                height: Math.round($('#height').val()),
+                label: annot.val()
+            }, function (e) {
+                console.log(e);
+            });
+            annot.val('');
+            if (blobs.length > 0) {
+                showNextBlob();
+            }
+            else {
+                img_select.setOptions({hide: true});
+            }
+        }
+    });
+
+    $('#next').on('click', function (e) {
+        $('#pass').fadeIn(100);
+        var i = $('img').data('nr') + 1;
+        img_select.setOptions({hide: true});
+        load_image(i);
+        history.pushState(null, "Image Annotator " + i, i);
+    });
+
+    $('#pass').on('click', function (e) {
+        if (blobs.length > 0) {
+            showNextBlob();
+            annot.focus();
+        }
+        else {
+            img_select.setOptions({hide: true});
+            $('#pass').fadeOut(100);
+        }
+    });
+
+    $('#split').on('click', function (e) {
+        var curr_blob = img_select.getSelection();
+        var nr = $('#split_count').val();
+        var width = curr_blob.width / nr + 1; // split blob into parts and add some padding to each
+        var new_blob = { x: curr_blob.x1, y: curr_blob.y1,
+            width: width, height: curr_blob.height
+        };
+        blobs.push(new_blob);
+        for (var i = 0; i < nr - 1; i++) {
+            new_blob = $.extend({}, new_blob);
+            new_blob.x = new_blob.x + width - 2; // take care of padding + move a bit to left
+            blobs.push(new_blob)
+        }
+        blobs.sort(function (a, b) {
+            return b.x - a.x;
+        });
+        showNextBlob();
+
+    });
+
+    $(document).keydown(function (e) {
+        if (e.keyCode == 13 && e.shiftKey) {
+            $('#next').click();
+            e.preventDefault()
+        }
+        if (e.keyCode == 13 && e.ctrlKey) {
+            $('#split').click();
+        }
+        if (e.keyCode == 13 && e.altKey) {
+            $('#pass').click();
+        }
+        if (e.keyCode >= 37 && e.keyCode <= 40) {
+            // for some reason the built-in imgareaselect keyboard support doesn't work
+            // maybe because of the focus hijacking, so here's a workaround
+            var sel = img_select.getSelection();
+            switch (e.keyCode) {
+                case 37:
+                    if (!e.ctrlKey) {
+                        sel.x1 -= 1;
+                    }
+                    sel.x2 -= 1;
+                    break;
+                case 38:
+                    if (!e.ctrlKey) {
+                        sel.y1 -= 1;
+                    }
+                    sel.y2 -= 1;
+                    break;
+                case 39:
+                    if (!e.ctrlKey) {
+                        sel.x1 += 1;
+                    }
+                    sel.x2 += 1;
+                    break;
+                case 40:
+                    if (!e.ctrlKey) {
+                        sel.y1 +=1;
+                    }
+                    sel.y2 +=1;
+                    break;
+                default:
+                    break;
+            }
+            img_select.setSelection(sel.x1, sel.y1, sel.x2, sel.y2);
+            img_select.update();
+        }
+    });
+
+    window.addEventListener("popstate", function (e) {
+        if (location.pathname.substr(1).length >= 1) {
+            load_image(parseInt(location.pathname.substr(1)));
+        }
+    });
+</script>
+</html>
