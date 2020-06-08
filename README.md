@@ -36,6 +36,16 @@ Work done during orientation workshop of Centre for Visual Information and Techn
 * Day11
   * [Ada guide](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/Ada%20guide)
   * [Image annotator webapp](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/webapp)<br>  Instructions to run: cd into the directory app, install all dependencies and type "flask run"
-  * [Graphics](https://github.com/avani17101/CVIT-Workshop/tree/master/day12/graphics-boilerplate)
+   Resources <br>
+     * [Flask Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
+     * [postressql Tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04)
+     * [postgress tutorial2](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e)
+   
+* Day12
+   * [Graphics](https://github.com/avani17101/CVIT-Workshop/tree/master/day12/graphics-boilerplate) <br>
+   Resources <br>
+     * [Open GL tutorial](http://www.opengl-tutorial.org)
+    
+
  
   
