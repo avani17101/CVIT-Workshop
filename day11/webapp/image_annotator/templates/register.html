@@ -4,7 +4,7 @@
     <div class="container">
       <h1>Register</h1>
       <br>
-      <form action="http://0.0.0.0:5000/login" method="post">
+      <form action="{{ url_for('addrec') }}" method="post">
         <input type="text" placeholder="Username" name="username" value="{{
           request.form.username }}">  <br> <br> <br>
         <input type="text" placeholder="Email" name="email" value="{{
@@ -13,9 +13,6 @@
           request.form.password }}">  <br> <br> <br>
         <input class="btn btn-default" type="submit" value="Register">
       </form>
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}
-      {% endif %}
     </div>
   </body>
 </html>

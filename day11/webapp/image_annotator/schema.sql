@@ -1,18 +1,18 @@
 drop table if exists annotations;
 create table annotations (
-  id integer primary key AUTOINCREMENT,
-  image varchar(30),
+  id integer primary key autoincrement,
+  image varchar,
   x integer,
   y integer,
   width integer,
   height integer,
-  label varchar(1)
+  label varchar
 );
 
 drop table if exists blobs;
 create table blobs (
   id integer primary key autoincrement,
-  image varchar(30),
+  image varchar,
   x integer,
   y integer,
   width integer,
@@ -22,15 +22,16 @@ create table blobs (
 drop table if exists lines;
 create table lines (
   id integer primary key autoincrement,
-  bon varchar(30),
+  bon varchar,
   x integer,
   y integer,
   width integer,
   height integer
 );
-
-create table Users(
-  username varchar(30) primary key,
-  password text
-
+drop table if exists users;
+    create table users (
+    id integer primary key autoincrement,
+    username text not null,
+    email text not null,
+    password text not null
 );

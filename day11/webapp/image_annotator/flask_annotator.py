@@ -10,6 +10,8 @@ import numpy
 import hashlib
 import os
 from werkzeug import secure_filename
+import click
+
 # from flask_images import resized_img_src
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -18,37 +20,77 @@ app.secret_key = 'super secret key'
 app.config['UPLOAD_FOLDER'] = 'static/img/'
 
 
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
 
 
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+# def connect_db():
+#     return sqlite3.connect(app.config['DATABASE'])
 
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
+# def init_db():
+#     with closing(connect_db()) as db:
+#         with app.open_resource('schema.sql', mode='r') as f:
+#             db.cursor().executescript(f.read())
+#         db.commit()
 
 
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
+import sqlite3
+
+import click
+from flask import current_app, g
+from flask.cli import with_appcontext
+
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(
+            current_app.config['DATABASE'],
+            detect_types=sqlite3.PARSE_DECLTYPES
+        )
+        g.db.row_factory = sqlite3.Row
+
+    return g.db
+
+
+def close_db(e=None):
+    db = g.pop('db', None)
+
     if db is not None:
         db.close()
+
+def init_db():
+    db = get_db()
+
+    with current_app.open_resource('schema.sql') as f:
+        db.executescript(f.read().decode('utf8'))
+
+
+@click.command('init-db')
+@with_appcontext
+def init_db_command():
+    """Clear the existing data and create new tables."""
+    init_db()
+    click.echo('Initialized the database.')
+
+def init_app(app):
+    app.teardown_appcontext(close_db)
+    app.cli.add_command(init_db_command)
+
+# init_app(app)
+# conn = sqlite3.connect('database.db')
+# print("Opened database successfully");
+
+# conn.execute('CREATE TABLE Users (id integer primary key autoincrement,username text not null,email text ,password text)')
+# print("Table created successfully");
+# conn.close()
 
 def check_password(hashed_password, user_password):
     return hashed_password == hashlib.md5(user_password.encode()).hexdigest()
 
 def validate(username, password):
-    con = sqlite3.connect('static/user.db')
+    con = sqlite3.connect('annotations.db')
     completion = False
     with con:
                 cur = con.cursor()
-                cur.execute("SELECT * FROM Users")
+                cur.execute("SELECT * FROM users")
                 rows = cur.fetchall()
                 for row in rows:
                     dbUser = row[0]
@@ -60,7 +102,29 @@ def validate(username, password):
 @app.route('/register')
 def register():
    return render_template('register.html')
-   
+
+@app.route('/addrec',methods = ['POST', 'GET'])
+def addrec():
+   if request.method == 'POST':
+        try:
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            
+            with sqlite3.connect("annotations.db") as con:
+                cur = con.cursor()
+                cur.execute("INSERT INTO users(username,email,password) VALUES (?,?,?)",(username,email,password) )
+                con.commit()
+                msg = "Record successfully added"
+        except:
+            con.rollback()
+            msg = "error in insert operation"
+      
+        finally:
+            return msg
+        #  return render_template("login.html",msg = msg)
+        con.close()
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -115,17 +179,8 @@ def add_blob():
 def query_blob(id):
     blob = numpy.ndarray("static\\img\\%d.jpg" % id).crop(int(request.form['x']), int(request.form['y']),
                                                   int(request.form['width']), int(request.form['height']))
-    if blob and 'SK_MODEL' in app.config:
-        if blob.height > blob.width:
-            blob = blob.resize(h=app.config['PATCH_SIZE'])
-        else:
-            blob = blob.resize(w=app.config['PATCH_SIZE'])
-        blob = blob.embiggen((app.config['PATCH_SIZE'], app.config['PATCH_SIZE']))
-        np_img = blob.getGrayNumpy().transpose().reshape(-1)
-        pred = labels.inverse_transform(sk_model.predict(np_img))[0]
-        return jsonify(prediction=pred)
-    else:
-        return jsonify(prediction='')
+
+    return jsonify(prediction='')
 
 
 @app.route('/line_blobs/<int:id>', methods=['GET'])
@@ -136,19 +191,7 @@ def line_blobs(id):
     img = numpy.ndaaray("static\\img\\%d.jpg" % id)
     for i, entry in enumerate(blobs):
         blob = img.crop(entry[1], entry[2], entry[3], entry[4])
-        if blob and 'SK_MODEL' in app.config:
-            if blob.height > blob.width:
-                blob = blob.resize(h=app.config['PATCH_SIZE'])
-            else:
-                blob = blob.resize(w=app.config['PATCH_SIZE'])
-            blob = blob.embiggen((app.config['PATCH_SIZE'], app.config['PATCH_SIZE']))
-            np_img = blob.getGrayNumpy().transpose().reshape(-1)
-            pred = labels.inverse_transform(sk_model.predict(np_img))[0]
-            if app.config['DEBUG']:
-                blob.save("tmp\\pic%d %s.jpg" % (i, pred))
-            entries.append(dict(x=entry[1], y=entry[2], width=entry[3], height=entry[4], pred=pred))
-        else:
-            entries.append(dict(x=entry[1], y=entry[2], width=entry[3], height=entry[4]))
+        entries.append(dict(x=entry[1], y=entry[2], width=entry[3], height=entry[4]))
     return jsonify(blobs=entries)
 
 
