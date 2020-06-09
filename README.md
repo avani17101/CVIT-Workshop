@@ -40,7 +40,7 @@ Work done during orientation workshop of Centre for Visual Information and Techn
   ![webapp images](https://github.com/avani17101/CVIT-Workshop/blob/master/day11/webapp/image_annotator/annotated.png)<br>
   Features Implemented <br>
     * Login/Register
-    * Drag the cursor to mark the boundary box for pre-uploaded iamges in dataset and provide label
+    * Drag the cursor to mark the boundary box for pre-uploaded images in dataset and provide label
     * Upload a new image to annotate
     * View all images with their respective annotations in Image Gallery
     <br>
