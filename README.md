@@ -37,8 +37,8 @@ Work done during orientation workshop of Centre for Visual Information and Techn
 * Day11
   * [Ada guide](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/Ada%20guide)
   * [Image annotator webapp](https://github.com/avani17101/CVIT-Workshop/tree/master/day11/webapp/image_annotator)<br>  Instructions to run: cd into the directory app, install all dependencies and type "python3 flask_annotator.py" <br> <br>
-  ![webapp images](https://github.com/avani17101/CVIT-Workshop/blob/master/day11/webapp/image_annotator/webapp.png)
-  ![login](https://github.com/avani17101/CVIT-Workshop/blob/master/day11/webapp/image_annotator/login.png) <br> <br>
+  ![webapp images](https://github.com/avani17101/CVIT-Workshop/blob/master/day11/webapp/image_annotator/annotated.png)<br>
+  Drag the cursor to mark the boundary box<br>
    Resources <br> 
      * [Flask Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
      * [postressql Tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04)
