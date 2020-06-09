@@ -3,6 +3,7 @@
 <head>
     <title>Image Annotation</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/imgareaselect-default.css') }}">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
         ul {
             list-style: none;
@@ -13,25 +14,54 @@
             height: auto !important;
         }
 
-        img {
-            max-height: 200px;
-        }
+        p {
+  margin-top: 30px;
+  margin-bottom: 5px;
+  margin-right: 150px;
+  margin-left: 30%;
+}
+
+ img {
+  margin-top: 30px;
+  margin-right: 150px;
+  margin-left: 30%;
+}
+
     </style>
 </head>
 <body>
-<input id="x1" type="number"/>
-<input id="y1" type="number"/>
-<input id="width" type="number"/>
-<input id="height" type="number"/>
-<img width=30% data-nr="{{ i }}" src="{{ url_for('static',filename='img/'~i~'.jpg') }}"/>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="'http://0.0.0.0:5000/images">Image Annotator</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href={{"http://0.0.0.0:5000/"}}>Annotate Images</a></li>
+      <li><a href= "{{ 'http://0.0.0.0:5000/gallery'}}">Image Gallery  </a></li>
+      <li><a href= "{{ 'http://0.0.0.0:5000/login'}}">Login  </a></li>
+      <li><a href= "{{ 'http://0.0.0.0:5000/register'}}">Register  </a></li>
+      
+    </ul>
+  </div>
+</nav>
+<br>
+<br>
+<p>Bounding Box</p>
+<p>
 
+<input width=10% id="x1" placeholder="x1" type="number"/>
+<input width=10% id="y1" placeholder="y1" type="number"/>
+<input width=10% id="width" placeholder="width" type="number"/>
+<input width=10% id="height" placeholder="height" type="number"/>
+</p>
+<img width=40%  data-nr="{{ i }}" src="{{ url_for('static',filename='img/'~i~'.jpg') }}"/>
 
 <div class="messagepop pop">
     <form method="post" id="new_message" action="/add">
         <p>
-            <label for="annotation">Letter:</label><input id="annotation" type="text" size=2>
+            <label for="annotation">Annotation:</label><input id="annotation" type="text" size=2>
             <label for="split_count">Split:</label><input id="split_count" type="text" size=2 value=2></p>
-
+  
         <p>
             <input type="submit" value="Send" name="commit" id="message_submit"/>
             <input type="button" value="Pass" name="pass" id="pass">

@@ -3,16 +3,18 @@ import io
 from contextlib import closing
 import pickle
 import cv2
-from flask import Flask, render_template, jsonify, make_response
+from flask import Flask, render_template, jsonify, make_response, flash
 import sqlite3
 from flask import request, g, redirect,url_for
 import numpy 
 import hashlib
 import os
+from werkzeug import secure_filename
 # from flask_images import resized_img_src
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('config.cfg')
+app.secret_key = 'super secret key'
 
 
 
@@ -55,7 +57,10 @@ def validate(username, password):
                         completion=check_password(dbPass, password)
     return completion
 
-
+@app.route('/register')
+def register():
+   return render_template('register.html')
+   
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -78,7 +83,18 @@ def index(id=0):
 def image_gall():
     hists = os.listdir('static/img')
     hists = ['img/' + file for file in hists]
-    return render_template('images_gallery.html', hists = hists)
+    return render_template('gallery.html', hists = hists)
+
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save(secure_filename(f.filename))
+      
+      hists = os.listdir('static/img')
+      hists = ['img/' + file for file in hists]
+      flash('Image uploaded successfully')
+      return render_template('images_gallery.html', hists = hists)
 
 @app.route('/add', methods=['POST'])
 def add_blob():
@@ -164,4 +180,4 @@ def admin(page=0):
     return render_template('admin.html', annotations=blobs, page=page)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0',debug = True)

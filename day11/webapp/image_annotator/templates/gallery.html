@@ -1,0 +1,36 @@
+<!DOCTYPE=html>
+<html>
+<head>
+    <title>
+        Store Report
+    </title>
+</head>
+        <style>
+        .item {
+            float:left;
+            width:220px;
+            margin:10px;
+        }
+        </style>
+<body>
+     {% with messages = get_flashed_messages() %}
+         {% if messages %}
+            <ul>
+               {% for message in messages %}
+               <li<{{ message }}</li>
+               {% endfor %}
+            </ul>
+         {% endif %}
+      {% endwith %}
+      
+    {{first_event}} to {{second_event}}
+    {% for hist in hists %}
+    <img src="{{url_for('static', filename=hist, width=100, height=100, quality=95)}}" alt="{{hist}}">
+    {% endfor %}
+    <form action = "http://0.0.0.0:5000/uploader" method = "POST" 
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" />
+         <input type = "submit"/>
+    </form>
+</body>
+</html>`

@@ -1,6 +1,6 @@
 drop table if exists annotations;
 create table annotations (
-  id integer primary key autoincrement,
+  id integer primary key AUTOINCREMENT,
   image varchar(30),
   x integer,
   y integer,
@@ -30,7 +30,7 @@ create table lines (
 );
 
 create table Users(
-  username varchar(30),
+  username varchar(30) primary key,
   password text
 
 );
