@@ -8,7 +8,8 @@ import sqlite3
 from flask import request, g, redirect,url_for
 import numpy 
 import hashlib
-
+import os
+# from flask_images import resized_img_src
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('config.cfg')
@@ -73,6 +74,11 @@ def login():
 def index(id=0):
     return render_template('images.html', i=id)
 
+@app.route('/gallery')
+def image_gall():
+    hists = os.listdir('static/img')
+    hists = ['img/' + file for file in hists]
+    return render_template('images_gallery.html', hists = hists)
 
 @app.route('/add', methods=['POST'])
 def add_blob():
@@ -82,7 +88,7 @@ def add_blob():
     g.db.commit()
     return jsonify(success=True)
 
-
+@app.route('/')
 @app.route('/query_blob/<int:id>', methods=['POST'])
 def query_blob(id):
     blob = numpy.ndarray("static\\img\\%d.jpg" % id).crop(int(request.form['x']), int(request.form['y']),
