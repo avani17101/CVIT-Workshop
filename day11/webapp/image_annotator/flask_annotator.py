@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('config.cfg')
 app.secret_key = 'super secret key'
-
+app.config['UPLOAD_FOLDER'] = 'static/img/'
 
 
 def connect_db():
@@ -89,12 +89,18 @@ def image_gall():
 def upload_file():
    if request.method == 'POST':
       f = request.files['file']
-      f.save(secure_filename(f.filename))
+      path, dirs, files = next(app.config['UPLOAD_FOLDER'])
+      file_count = len(files)
+      file_count = file_count+1
+    #   _, ext = os.path.splitext(f.filename)
+    #   f.filename = str(file_count)+'.jpg'
+      filename = secure_filename(f.filename)
+      f.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
       
       hists = os.listdir('static/img')
       hists = ['img/' + file for file in hists]
       flash('Image uploaded successfully')
-      return render_template('images_gallery.html', hists = hists)
+      return render_template('images.html', hists = hists)
 
 @app.route('/add', methods=['POST'])
 def add_blob():
